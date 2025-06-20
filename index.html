@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Quiz Challenge | CodSoft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quiz-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .option:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <div class="bg-white rounded-xl shadow-lg inline-block px-6 py-3 mb-4">
+                <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-800">
+                    UPSC Quiz Challenge
+                </h1>
+            </div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Test your civil services knowledge with these curated questions from History, Polity and Geography
+            </p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quizApp" class="max-w-2xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden quiz-card">
+            <!-- Quiz Selection Screen -->
+            <div id="quizSelection" class="p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Select Quiz Category</h2>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <button onclick="startQuiz('history')" 
+                            class="category-btn bg-amber-100 hover:bg-amber-200 text-amber-800 py-4 px-6 rounded-lg transition-all flex items-center">
+                        <span class="text-2xl mr-3">🕰️</span>
+                        <span class="text-left">
+                            <span class="block font-bold">History</span>
+                            <span class="text-sm">10 Questions</span>
+                        </span>
+                    </button>
+                    <button onclick="startQuiz('polity')" 
+                            class="category-btn bg-blue-100 hover:bg-blue-200 text-blue-800 py-4 px-6 rounded-lg transition-all flex items-center">
+                        <span class="text-2xl mr-3">⚖️</span>
+                        <span class="text-left">
+                            <span class="block font-bold">Polity</span>
+                            <span class="text-sm">10 Questions</span>
+                        </span>
+                    </button>
+                    <button onclick="startQuiz('geography')" 
+                            class="category-btn bg-green-100 hover:bg-green-200 text-green-800 py-4 px-6 rounded-lg transition-all flex items-center">
+                        <span class="text-2xl mr-3">🌍</span>
+                        <span class="text-left">
+                            <span class="block font-bold">Geography</span>
+                            <span class="text-sm">10 Questions</span>
+                        </span>
+                    </button>
+                    <button onclick="startQuiz('mixed')" 
+                            class="category-btn bg-purple-100 hover:bg-purple-200 text-purple-800 py-4 px-6 rounded-lg transition-all flex items-center">
+                        <span class="text-2xl mr-3">🎯</span>
+                        <span class="text-left">
+                            <span class="block font-bold">Mixed Bag</span>
+                            <span class="text-sm">All Categories</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen (Hidden Initially) -->
+            <div id="quizScreen" class="hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="quizCategory" class="text-xl font-semibold text-gray-700"></h2>
+                    <div class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                        Question <span id="currentQuestion">1</span>/<span id="totalQuestions">10</span>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 id="questionText" class="text-lg font-medium text-gray-800 mb-4"></h3>
+                    <div id="optionsContainer" class="space-y-3"></div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+                    <button id="prevBtn" onclick="prevQuestion()" 
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50">
+                        ← Previous
+                    </button>
+                    <button id="nextBtn" onclick="nextQuestion()" 
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        Next →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen (Hidden Initially) -->
+            <div id="resultsScreen" class="hidden p-8 text-center">
+                <div class="mb-6">
+                    <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">📊</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
+                    <p id="scoreText" class="text-lg text-gray-600 mb-6"></p>
+                    <div class="bg-indigo-50 rounded-lg p-4 max-w-md mx-auto">
+                        <p id="performanceComment" class="text-indigo-800 font-medium"></p>
+                    </div>
+                </div>
+                <button onclick="resetQuiz()" 
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    Take Another Quiz
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-gray-500 text-sm">
+            <p>Developed by <strong>Aryan Dakhare</strong> as a Web Development Intern at <strong>CodSoft</strong></p>
+            <p class="mt-1">UPSC questions curated from previous year papers</p>
+        </footer>
+    </div>
+
+    <script>
+        // UPSC Question Bank
+        const questionBank = {
+            history: [
+                {
+                    question: "The 'Doctrine of Lapse' was associated with which Governor-General?",
+                    options: ["Lord Dalhousie", "Lord Cornwallis", "Lord Wellesley", "Lord Bentinck"],
+                    answer: "Lord Dalhousie"
+                },
+                {
+                    question: "Who founded the 'Gadar Party' in 1913?",
+                    options: ["Lala Hardayal", "Bhagat Singh", "Rash Behari Bose", "Sohan Singh Bhakna"],
+                    answer: "Lala Hardayal"
+                },
+                {
+                    question: "The ancient university of Nalanda was established during which dynasty?",
+                    options: ["Maurya", "Gupta", "Pala", "Kushan"],
+                    answer: "Gupta"
+                },
+                {
+                    question: "Who was the first woman President of the Indian National Congress?",
+                    options: ["Sarojini Naidu", "Annie Besant", "Vijaya Lakshmi Pandit", "Indira Gandhi"],
+                    answer: "Annie Besant"
+                },
+                {
+                    question: "The 'Poona Pact' (1932) was between Mahatma Gandhi and:",
+                    options: ["Jawaharlal Nehru", "Subhash Chandra Bose", "B.R. Ambedkar", "Muhammad Ali Jinnah"],
+                    answer: "B.R. Ambedkar"
+                }
+            ],
+            polity: [
+                {
+                    question: "Which article of the Indian Constitution deals with the Fundamental Right to Equality?",
+                    options: ["Article 14", "Article 19", "Article 21", "Article 32"],
+                    answer: "Article 14"
+                },
+                {
+                    question: "The 'National Emergency' under Article 352 has been declared how many times in India?",
+                    options: ["Once", "Twice", "Thrice", "Never"],
+                    answer: "Thrice"
+                },
+                {
+                    question: "Who appoints the Chief Election Commissioner of India?",
+                    options: ["Prime Minister", "President", "Parliament", "Supreme Court"],
+                    answer: "President"
+                },
+                {
+                    question: "The 73rd Constitutional Amendment relates to:",
+                    options: ["Panchayati Raj", "Municipalities", "Cooperative Societies", "Finance Commission"],
+                    answer: "Panchayati Raj"
+                },
+                {
+                    question: "The 'Kesavananda Bharati case' (1973) is related to:",
+                    options: ["Right to Property", "Basic Structure Doctrine", "Reservation Policy", "Freedom of Speech"],
+                    answer: "Basic Structure Doctrine"
+                }
+            ],
+            geography: [
+                {
+                    question: "Which river is known as the 'Sorrow of Bihar'?",
+                    options: ["Ganga", "Kosi", "Gandak", "Son"],
+                    answer: "Kosi"
+                },
+                {
+                    question: "The 'Duncan Passage' is located between:",
+                    options: ["Andaman and Nicobar", "Lakshadweep and Maldives", "South Andaman and Little Andaman", "India and Sri Lanka"],
+                    answer: "South Andaman and Little Andaman"
+                },
+                {
+                    question: "Which state has the longest coastline in India?",
+                    options: ["Gujarat", "Andhra Pradesh", "Tamil Nadu", "Maharashtra"],
+                    answer: "Gujarat"
+                },
+                {
+                    question: "The 'Karewas' of Kashmir are known for:",
+                    options: ["Glacial deposits", "Volcanic soil", "Sand dunes", "Forest cover"],
+                    answer: "Glacial deposits"
+                },
+                {
+                    question: "Which of these is NOT a West-flowing river?",
+                    options: ["Narmada", "Tapi", "Mahi", "Godavari"],
+                    answer: "Godavari"
+                }
+            ]
+        };
+
+        // Quiz Variables
+        let currentCategory = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+
+        // Start Quiz
+        function startQuiz(category) {
+            currentCategory = category;
+            
+            // Prepare questions based on category
+            if (category === 'mixed') {
+                currentQuestions = [
+                    ...questionBank.history,
+                    ...questionBank.polity,
+                    ...questionBank.geography
+                ].sort(() => 0.5 - Math.random()).slice(0, 10);
+            } else {
+                currentQuestions = [...questionBank[category]];
+            }
+            
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = Array(currentQuestions.length).fill(null);
+            
+            // Update UI
+            document.getElementById('quizSelection').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('quizCategory').textContent = 
+                category === 'history' ? 'History Quiz' :
+                category === 'polity' ? 'Polity Quiz' :
+                category === 'geography' ? 'Geography Quiz' : 'Mixed Quiz';
+            
+            loadQuestion();
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = currentQuestions.length;
+            
+            // Enable/disable navigation buttons
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            // Load options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const isSelected = userAnswers[currentQuestionIndex] === option;
+                const isCorrect = option === question.answer;
+                
+                const optionElement = document.createElement('button');
+                optionElement.className = `option w-full text-left p-3 rounded-lg border transition-all ${isSelected ? 
+                    (isCorrect ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300') : 
+                    'bg-white border-gray-200 hover:border-indigo-300'}`;
+                optionElement.innerHTML = `
+                    <span class="inline-block w-6 h-6 rounded-full mr-3 border-2 ${isSelected ? 
+                        (isCorrect ? 'bg-green-500 border-green-600' : 'bg-red-500 border-red-600') : 
+                        'bg-gray-100 border-gray-300'}"></span>
+                    ${option}
+                `;
+                optionElement.onclick = () => selectAnswer(option);
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(selectedOption) {
+            const question = currentQuestions[currentQuestionIndex];
+            userAnswers[currentQuestionIndex] = selectedOption;
+            
+            if (selectedOption === question.answer) {
+                score++;
+            }
+            
+            loadQuestion(); // Refresh to show selected answer
+        }
+
+        // Navigation
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        // Show Results
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            const percentage = Math.round((score / currentQuestions.length) * 100);
+            document.getElementById('scoreText').textContent = 
+                `You scored ${score} out of ${currentQuestions.length} (${percentage}%)`;
+            
+            let comment = '';
+            if (percentage >= 80) {
+                comment = "Excellent! You're UPSC material! 🎉";
+            } else if (percentage >= 60) {
+                comment = "Good job! Keep practicing! 👍";
+            } else {
+                comment = "Keep studying - you'll improve! 📚";
+            }
+            document.getElementById('performanceComment').textContent = comment;
+        }
+
+        // Reset Quiz
+        function resetQuiz() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('quizSelection').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
